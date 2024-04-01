@@ -1,10 +1,6 @@
 from RF24 import RF24, RF24_PA_LOW, RF24_1MBPS
 
 
-
-RECV_CHANNEL = 76
-SEND_CHANNEL = 77
-
 # GPIO for spidev0.1
 CSN_PIN_SEND = 0
 CE_PIN_SEND = 17
@@ -34,10 +30,6 @@ def setup_radios():
     # Set the data rate
     radio_send.setDataRate(RF24_1MBPS)  # Options are 1MBPS, 2MBPS, 250KBPS
     radio_recv.setDataRate(RF24_1MBPS)
-
-    # Set the RF communication channel (0-125, 2.4GHz to 2.525GHz)
-    radio_send.setChannel(SEND_CHANNEL)
-    radio_recv.setChannel(RECV_CHANNEL)
 
     # Optionally, you can enable dynamic payloads and auto-acknowledgment features
     radio_send.enableDynamicPayloads()
