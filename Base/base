@@ -6,6 +6,8 @@ sys.path.append('../')
 from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 import common
 
+from multiprocessing import Process, current_process
+
 # from common import SPI
 # spi_0 = SPI(10, 9, 11, 8)
 # spi_1 = SPI(20, 19, 21, 7)
@@ -14,7 +16,11 @@ import common
 # Setup for GPIO pins (CE, CSN) on the Raspberry Pi
 # CE pin on GPIO17, CSN pin on GPIO0 (using spidev0.0)
 
-radio_send, _ = common.setup_radios()
+radio_send, radio_recv = common.setup_radios()
+
+radio_send.setChannel(77)
+
+radio_recv.setChannel(76)
 
 # Print out the configuration for verification
 print("Sender NRF24L01+ configured successfully!")
@@ -22,42 +28,78 @@ print(f"PA Level:  {radio_send.getPALevel()}")
 print(f"Data Rate: {radio_send.getDataRate()}")
 print(f"Channel:   {radio_send.getChannel()}")
 print()
-# print("Receiver NRF24L01+ configured successfully!")
-# print(f"PA Level:  {radio_recv.getPALevel()}")
-# print(f"Data Rate: {radio_recv.getDataRate()}")
-# print(f"Channel:   {radio_recv.getChannel()}")
+print("Receiver NRF24L01+ configured successfully!")
+print(f"PA Level:  {radio_recv.getPALevel()}")
+print(f"Data Rate: {radio_recv.getDataRate()}")
+print(f"Channel:   {radio_recv.getChannel()}")
 
 
 def main():
-    radio_tx()
+    tx_thread = Process(target=radio_tx)
+    rx_thread = Process(target=radio_rx)
+
+    tx_thread.start()
+    rx_thread.start()
+
+    tx_thread.join()
+    rx_thread.join()
 
 
 def radio_tx():
-    radio_send.setChannel(76)
-    radio_send.open_tx_pipe(b'1Node')
+   # radio_send.setChannel(76)
+    radio_send.open_tx_pipe(b'2Node')
     radio_send.listen = False
 
     radio_send.payload_size = struct.calcsize('<f')
     val = 0.0
 
+    proc = current_process().pid
+
     count = 10
+    print(f'Transmitting on channel ')
     while count:
         buf = struct.pack('<f', val)
         start_timer = time.monotonic_ns()
         result = radio_send.write(buf)
         end_timer = time.monotonic_ns()
         if not result:
-            print("Transmission failed or timed out")
+            print(f"{proc} : Transmission failed or timed out")
         else:
             print(
-                "Transmission successful! Time to Transmit:",
+                f"{proc} : Transmission successful! Time to Transmit:",
                 f"{(end_timer - start_timer) / 1000} us. Sent: {val}",
             )
             val += 0.11
         time.sleep(1)
         count -= 1
     
+
+def radio_rx():
+    #radio_recv.setChannel(77)
+    timeout = 10
+    radio_recv.open_rx_pipe(0, b'1Node')
+    radio_recv.payload_size = struct.calcsize("<f")
+    payload = [0.0]
     
+    radio_recv.listen = True
+
+    proc = current_process().pid
+
+    print(f'Listening on channel ')
+
+    start = time.monotonic()
+    while (time.monotonic() - start) < timeout:
+        has_payload, pipe_number = radio_recv.available_pipe()
+        if has_payload:
+            length = radio_recv.payload_size  # grab the payload length
+            # fetch 1 payload from RX FIFO
+            received = radio_recv.read(length)  # also clears radio.irq_dr status flag
+            # expecting a little endian float, thus the format string "<f"
+            # received[:4] truncates padded 0s in case dynamic payloads are disabled
+            payload[0] = struct.unpack("<f", received[:4])[0]
+            # print details about the received packet
+            print(f"{proc} : Received {length} bytes on pipe {pipe_number}: {payload[0]}")
+            start = time.monotonic()  # reset the timeout timer
 
 
 main()
