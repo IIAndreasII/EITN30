@@ -1,4 +1,4 @@
-from RF24 import RF24, RF24_PA_LOW, RF24_1MBPS
+from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 
 
 # GPIO for spidev0.1

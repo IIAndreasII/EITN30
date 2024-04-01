@@ -1,9 +1,9 @@
 #!/bin/python3
 import sys
-
+import struct, time
 sys.path.append('../')
 
-from RF24 import RF24, RF24_PA_LOW, RF24_1MBPS
+from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 import common
 
 # from common import SPI
@@ -14,15 +14,50 @@ import common
 # Setup for GPIO pins (CE, CSN) on the Raspberry Pi
 # CE pin on GPIO17, CSN pin on GPIO0 (using spidev0.0)
 
-radio_send, radio_recv = common.setup_radios()
+radio_send, _ = common.setup_radios()
 
 # Print out the configuration for verification
-print("NRF24L01+ configured successfully!")
+print("Sender NRF24L01+ configured successfully!")
 print(f"PA Level:  {radio_send.getPALevel()}")
 print(f"Data Rate: {radio_send.getDataRate()}")
 print(f"Channel:   {radio_send.getChannel()}")
-print('-------------------------------------')
-print("NRF24L01+ configured successfully!")
-print(f"PA Level:  {radio_recv.getPALevel()}")
-print(f"Data Rate: {radio_recv.getDataRate()}")
-print(f"Channel:   {radio_recv.getChannel()}")
+print()
+# print("Receiver NRF24L01+ configured successfully!")
+# print(f"PA Level:  {radio_recv.getPALevel()}")
+# print(f"Data Rate: {radio_recv.getDataRate()}")
+# print(f"Channel:   {radio_recv.getChannel()}")
+
+
+def main():
+    radio_tx()
+
+
+def radio_tx():
+    radio_send.setChannel(76)
+    radio_send.open_tx_pipe(b'1Node')
+    radio_send.listen = False
+
+    radio_send.payload_size = struct.calcsize('<f')
+    val = 0.0
+
+    count = 10
+    while count:
+        buf = struct.pack('<f', val)
+        start_timer = time.monotonic_ns()
+        result = radio_send.write(buf)
+        end_timer = time.monotonic_ns()
+        if not result:
+            print("Transmission failed or timed out")
+        else:
+            print(
+                "Transmission successful! Time to Transmit:",
+                f"{(end_timer - start_timer) / 1000} us. Sent: {val}",
+            )
+            val += 0.11
+        time.sleep(1)
+        count -= 1
+    
+    
+
+
+main()
