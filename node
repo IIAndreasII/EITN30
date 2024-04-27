@@ -36,8 +36,10 @@ def main():
     global rx
     global tx
     if sys.argv[1] == 'base':
+        print("Starting node as base station...")
         is_base = True
     elif sys.argv[1] == 'client':
+        print("Starting node as client...")
         is_base = False
     else:
         print("error: wrong arguments. Use 'base' or 'client")
@@ -59,6 +61,13 @@ def main():
     rx.setChannel(rx_channel)
     tx.setChannel(tx_channel)
 
+    print(f"rx channel: {rx_channel}")
+    print(f"rx address: {rx_address}")
+
+    print(f"tx channel: {tx_channel}")
+    print(f"tx_address: {tx_address}")
+    
+    
     rx.open_rx_pipe(0, rx_address[0])
     rx.listen = True
 
@@ -92,6 +101,7 @@ def recv():
     while running:
         has_p, _ = rx.available_pipe()
         if has_p:
+            print("recieved packet")
             length = rx.payload_size
             p = rx.read(length)
             recv_q.put(p)
@@ -122,6 +132,7 @@ def handle_frames():
         if radio_packet == common.TRANSMISSION_END:
             packet = common.from_radio_packets(collected_packets)
             tun.write(packet)
+            print("wrote packet to tun")
             collected_packets = []
         
         # Do something with radio_packet
@@ -134,8 +145,10 @@ def setup_tun(is_base):
     try:
         tun = TunTap(nic_type='Tun', nic_name='MyG')
         if is_base:
+            print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
             tun.config(ip=BASE_IP, mask=MASK)
         else:
+            print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
             tun.config(ip=CLIENT_IP, mask=MASK)
 
     except Exception as e:
