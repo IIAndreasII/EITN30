@@ -74,13 +74,13 @@ def to_radio_packets(buf: bytes):
 
 def from_radio_packets(buf):
 
-    if buf[0] != TRANSMISSION_START or buf[-1] != TRANSMISSION_END:
+    if buf[0] != [TRANSMISSION_START] or buf[-1] != [TRANSMISSION_END]:        
         raise Exception("Radio packet sanity check failed!")
 
-    parsed_bytes = []
-    for i in range(1, len(buf)):
-        idx = int(buf[i][0])
-        parsed_bytes[idx] = buf[i][1:]
+    parsed_bytes = [None] * (len(buf) - 2) # ignore control
+    for i in range(1, len(buf) - 1):
+        idx = buf[i][0][0]
+        parsed_bytes[idx] = buf[i][0][1:] # it is what it is
 
     flattened = bytes([x for xs in parsed_bytes for x in xs])
 
@@ -92,3 +92,7 @@ buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
 packets = to_radio_packets(buf)
 
 print(packets)
+
+flat = from_radio_packets(packets)
+
+print(flat)
