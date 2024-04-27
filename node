@@ -1,0 +1,149 @@
+#!/bin/python3
+import sys
+sys.path.append('../')
+
+from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
+from tuntap import TunTap
+
+from queue import SimpleQueue
+from multiprocessing import Process, current_process
+import common
+
+running = True
+
+rx = None
+tx = None
+
+rx_address = ''
+tx_address = ''
+
+rx_channel = -1
+tx_channel = -1
+
+is_base = False
+
+NODE1 = [b'1Node']
+NODE2 = [b'2Node']
+
+BASE_IP   = '11.11.11.2'
+CLIENT_IP = '11.11.11.3'
+
+MASK = '255.255.255.0'
+
+tun = None
+
+def main():
+
+    if sys.argv[1] == 'base':
+        is_base = True
+    elif sys.argv[1] == 'client':
+        is_base = False
+    else:
+        print("error: wrong arguments. Use 'base' or 'client")
+        sys.exit(1)
+
+    tx, rx = common.setup_radios()
+
+    if is_base:
+        rx_channel = 76
+        tx_channel = 77
+        rx_address = NODE1
+        tx_address = NODE2
+    else:
+        rx_channel = 77
+        tx_channel = 76
+        rx_address = NODE2
+        tx_address = NODE1
+
+    rx.setChannel(rx_channel)
+    tx.setChannel(tx_channel)
+
+    rx.open_rx_pipe(0, rx_address[0])
+    rx.listen = True
+
+    tx.open_tx_pipe(tx_address[0])
+    tx.listen = False
+
+    tx_thread = Process(target=send)
+    rx_thread = Process(target=recv)
+    tun_thread = Process(target=tun_listen)
+    frame_thread = Process(target=handle_frames)
+
+    tx_thread.start()
+    rx_thread.start()
+    tun_thread.start()
+    frame_thread.start()
+
+    tx_thread.join()
+    rx_thread.join()
+    tun_thread.join()
+    frame_thread.join()
+
+
+recv_q = SimpleQueue()
+send_q = SimpleQueue()
+
+def recv():
+    while running:
+        has_p, _ = rx.available_pipe()
+        if has_p:
+            length = rx.payload_size
+            p = rx.read(length)
+            recv_q.put(p)
+
+
+def send():
+    while running:
+        p = send_q.get()
+        tx.write(p)
+
+
+def tun_listen():
+    while running:
+        buf = tun.read()
+        rp = common.to_radio_packets(buf)
+        for p in rp:
+            send_q.put(p)
+        
+
+def handle_frames():
+    
+    collected_packets = []
+    while running:
+        radio_packet = recv_q.get()
+        collected_packets.append(radio_packet)
+        if radio_packet == common.TRANSMISSION_END:
+            packet = common.from_radio_packets(collected_packets)
+            tun.write(packet)
+            collected_packets = []
+        
+        # Do something with radio_packet
+
+        print()
+
+
+def setup_tun(is_base):
+    try:
+        tun = TunTap(nic_type='Tun', nic_name='MyG')
+        if is_base:
+            tun.config(ip=BASE_IP, mask=MASK)
+        else:
+            tun.config(ip=CLIENT_IP, mask=MASK)
+
+    except Exception as e:
+        print(f"Failed to setup tun device!\n{e}")
+        sys.exit(1)
+
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        running = False
+    except Exception as e:
+        running = False
+        print(e)
+        sys.exit(1)
+
+

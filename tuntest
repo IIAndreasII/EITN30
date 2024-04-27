@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+
+from tuntap import TunTap
+
+
+IP = '11.11.11.2'
+MASK = '255.255.255.0'
+
+
+try:
+
+    iface = 'longge'
+     # Create and configure a TUN interface
+    tun = TunTap(nic_type="Tun", nic_name=iface)
+    tun.config(ip=IP, mask=MASK, gateway="192.168.2.2")
+
+    while True:
+
+        buf1 = tun.read()
+        print(buf1)
+
+
+except KeyboardInterrupt:
+    tun.close()
+
+# Write to TUN interface
+# Close and destroy interface
