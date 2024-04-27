@@ -32,9 +32,61 @@ MASK = '255.255.255.0'
 
 tun = None
 
-def main():
-    global rx
-    global tx
+recv_q = SimpleQueue()
+send_q = SimpleQueue()
+
+def recv():
+    while running:
+        has_p, _ = rx.available_pipe()
+        if has_p:
+            print("recieved packet")
+            length = rx.payload_size
+            p = rx.read(length)
+            recv_q.put(p)
+
+
+def send():
+    while running:
+        rp = send_q.get()
+        for p in rp:
+            tx.write(p)
+
+
+def tun_listen():
+    while running:
+        buf = tun.read()
+        rp = common.to_radio_packets(buf)
+        send_q.put(rp)
+        
+
+def handle_frames():
+    collected_packets = []
+    while running:
+        radio_packet = recv_q.get()
+        collected_packets.append(radio_packet)
+        if radio_packet == common.TRANSMISSION_END:
+            packet = common.from_radio_packets(collected_packets)
+            tun.write(packet)
+            print("wrote packet to tun")
+            collected_packets = []
+
+
+# def setup_tun(is_base):
+#     try:
+#         tun = TunTap(nic_type='Tun', nic_name='MyG')
+#         if is_base:
+#             print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
+#             tun.config(ip=BASE_IP, mask=MASK)
+#         else:
+#             print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
+#             tun.config(ip=CLIENT_IP, mask=MASK)
+
+#     except Exception as e:
+#         print(f"Failed to setup tun device!\n{e}")
+#         sys.exit(1)
+
+
+try:
     if sys.argv[1] == 'base':
         print("Starting node as base station...")
         is_base = True
@@ -44,6 +96,15 @@ def main():
     else:
         print("error: wrong arguments. Use 'base' or 'client")
         sys.exit(1)
+
+    tun = TunTap(nic_type='Tun', nic_name='MyG')
+    if is_base:
+        print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
+        tun.config(ip=BASE_IP, mask=MASK)
+    else:
+        print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
+        tun.config(ip=CLIENT_IP, mask=MASK)
+
 
     tx, rx = common.setup_radios()
 
@@ -74,7 +135,7 @@ def main():
     tx.open_tx_pipe(tx_address[0])
     tx.listen = False
 
-    setup_tun(is_base)
+    #setup_tun(is_base)
 
 
     tx_thread = Process(target=send)
@@ -91,82 +152,11 @@ def main():
     rx_thread.join()
     tun_thread.join()
     frame_thread.join()
-
-
-recv_q = SimpleQueue()
-send_q = SimpleQueue()
-
-def recv():
-    global rx
-    while running:
-        has_p, _ = rx.available_pipe()
-        if has_p:
-            print("recieved packet")
-            length = rx.payload_size
-            p = rx.read(length)
-            recv_q.put(p)
-
-
-def send():
-    global tx
-    while running:
-        rp = send_q.get()
-        for p in rp:
-            tx.write(p)
-
-
-def tun_listen():
-    global tun
-    while running:
-        buf = tun.read()
-        rp = common.to_radio_packets(buf)
-        send_q.put(rp)
-        
-
-def handle_frames():
-    
-    collected_packets = []
-    while running:
-        radio_packet = recv_q.get()
-        collected_packets.append(radio_packet)
-        if radio_packet == common.TRANSMISSION_END:
-            packet = common.from_radio_packets(collected_packets)
-            tun.write(packet)
-            print("wrote packet to tun")
-            collected_packets = []
-        
-        # Do something with radio_packet
-
-        print()
-
-
-def setup_tun(is_base):
-    global tun
-    try:
-        tun = TunTap(nic_type='Tun', nic_name='MyG')
-        if is_base:
-            print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
-            tun.config(ip=BASE_IP, mask=MASK)
-        else:
-            print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
-            tun.config(ip=CLIENT_IP, mask=MASK)
-
-    except Exception as e:
-        print(f"Failed to setup tun device!\n{e}")
-        sys.exit(1)
-
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        running = False
-        tun.close()
-    except Exception as e:
-        running = False
-        tun.close()
-        print(e)
-        sys.exit(1)
-
-
+except KeyboardInterrupt:
+    running = False
+    tun.close()
+except Exception as e:
+    running = False
+    tun.close()
+    print(e)
+    sys.exit(1)
