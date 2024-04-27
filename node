@@ -6,7 +6,8 @@ from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 from tuntap import TunTap
 
 from queue import SimpleQueue
-from multiprocessing import Process, current_process
+#from multiprocessing import Process, current_process
+import multiprocessing as mp
 import common
 
 running = True
@@ -32,10 +33,9 @@ MASK = '255.255.255.0'
 
 tun = None
 
-recv_q = SimpleQueue()
-send_q = SimpleQueue()
 
-def recv():
+
+def recv(recv_q):
     while running:
         has_p, _ = rx.available_pipe()
         if has_p:
@@ -45,21 +45,21 @@ def recv():
             recv_q.put(p)
 
 
-def send():
+def send(send_q):
     while running:
         rp = send_q.get()
         for p in rp:
             tx.write(p)
 
 
-def tun_listen():
+def tun_listen(send_q):
     while running:
         buf = tun.read()
         rp = common.to_radio_packets(buf)
         send_q.put(rp)
         
 
-def handle_frames():
+def handle_frames(recv_q):
     collected_packets = []
     while running:
         radio_packet = recv_q.get()
@@ -126,7 +126,7 @@ try:
     print(f"rx address: {rx_address}")
 
     print(f"tx channel: {tx_channel}")
-    print(f"tx_address: {tx_address}")
+    print(f"tx address: {tx_address}")
     
     
     rx.open_rx_pipe(0, rx_address[0])
@@ -137,11 +137,13 @@ try:
 
     #setup_tun(is_base)
 
+    recv_q = mp.Queue()
+    send_q = mp.Queue()
 
-    tx_thread = Process(target=send)
-    rx_thread = Process(target=recv)
-    tun_thread = Process(target=tun_listen)
-    frame_thread = Process(target=handle_frames)
+    tx_thread = mp.Process(target=send, args=(send_q,))
+    rx_thread = mp.Process(target=recv, args=(recv_q,))
+    tun_thread = mp.Process(target=tun_listen, args=(send_q,))
+    frame_thread = mp.Process(target=handle_frames, args=(recv_q,))
 
     tx_thread.start()
     rx_thread.start()

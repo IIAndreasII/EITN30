@@ -37,7 +37,6 @@ def setup_radios():
 
     radio_recv.enableDynamicPayloads()
     radio_recv.enableAckPayload()
-    print("here")
     return radio_send, radio_recv
 
 
