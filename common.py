@@ -37,7 +37,7 @@ def setup_radios():
 
     radio_recv.enableDynamicPayloads()
     radio_recv.enableAckPayload()
-
+    print("here")
     return radio_send, radio_recv
 
 
@@ -87,12 +87,12 @@ def from_radio_packets(buf):
     return flattened
 
 
-buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
+# buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
 
-packets = to_radio_packets(buf)
+# packets = to_radio_packets(buf)
 
-print(packets)
+# print(packets)
 
-flat = from_radio_packets(packets)
+# flat = from_radio_packets(packets)
 
-print(flat)
+# print(flat)
