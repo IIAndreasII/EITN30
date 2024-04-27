@@ -110,8 +110,9 @@ def recv():
 def send():
     global tx
     while running:
-        p = send_q.get()
-        tx.write(p)
+        rp = send_q.get()
+        for p in rp:
+            tx.write(p)
 
 
 def tun_listen():
@@ -119,8 +120,7 @@ def tun_listen():
     while running:
         buf = tun.read()
         rp = common.to_radio_packets(buf)
-        for p in rp:
-            send_q.put(p)
+        send_q.put(rp)
         
 
 def handle_frames():
