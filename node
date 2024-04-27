@@ -34,27 +34,28 @@ MASK = '255.255.255.0'
 tun = None
 
 
-
 def recv(recv_q):
     while running:
         has_p, _ = rx.available_pipe()
         if has_p:
-            print("recieved packet")
             length = rx.payload_size
+            print(f"recieved packet with length: {length}")
             p = rx.read(length)
             recv_q.put(p)
+            print(recv_q.qsize())
 
 
 def send(send_q):
     while running:
         rp = send_q.get()
         for p in rp:
-            tx.write(p)
+            tx.write(p[0])
 
 
 def tun_listen(send_q):
     while running:
         buf = tun.read()
+        print(buf)
         rp = common.to_radio_packets(buf)
         send_q.put(rp)
         
