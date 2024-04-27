@@ -13,6 +13,9 @@ from multiprocessing import Process, current_process
 # spi_1 = SPI(20, 19, 21, 7)
 
 
+
+
+
 # Setup for GPIO pins (CE, CSN) on the Raspberry Pi
 # CE pin on GPIO17, CSN pin on GPIO0 (using spidev0.0)
 
@@ -100,6 +103,10 @@ def radio_rx():
             # print details about the received packet
             print(f"{proc} : Received {length} bytes on pipe {pipe_number}: {payload[0]}")
             start = time.monotonic()  # reset the timeout timer
+
+
+
+
 
 
 main()

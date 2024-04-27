@@ -1,3 +1,4 @@
+import queue
 import sys
 import struct
 import time
@@ -13,16 +14,18 @@ radio_recv.setChannel(77)
 
 address = [b"1Node"]
 
+recv_q = queue.SimpleQueue()
+send_q = queue.SimpleQueue()
+
+running = True
+
+
 def send():
     radio_send.open_tx_pipe(address[0])
     radio_send.listen = False
 
-    radio_send.payload_size = struct.calcsize('<f')
-    val = 0.0
-
-    count = 10
-    while count:
-        buf = struct.pack('<f', val)
+    while running:
+        buf = send_q.get()
         start_timer = time.monotonic_ns()
         result = radio_send.write(buf)
         end_timer = time.monotonic_ns()
@@ -31,7 +34,7 @@ def send():
         else:
             print(
                 "Transmission successful! Time to Transmit:",
-                f"{(end_timer - start_timer) / 1000} us. Sent: {val}",
+                f"{(end_timer - start_timer) / 1000} us"
             )
             val += 0.11
         time.sleep(1)
@@ -39,26 +42,18 @@ def send():
 
 
 def recieve():
-    timeout = 10
-    radio_recv.open_rx_pipe(0, b"2Node")
-    radio_recv.payload_size = struct.calcsize("<f")
-    payload = [0.0]
-    
+
+    radio_recv.open_rx_pipe(0, b"2Node")    
     radio_recv.listen = True
 
-    start = time.monotonic()
-    while (time.monotonic() - start) < timeout:
+    while running:
         has_payload, pipe_number = radio_recv.available_pipe()
         if has_payload:
-            length = radio_recv.payload_size  # grab the payload length
-            # fetch 1 payload from RX FIFO
-            received = radio_recv.read(length)  # also clears radio.irq_dr status flag
-            # expecting a little endian float, thus the format string "<f"
-            # received[:4] truncates padded 0s in case dynamic payloads are disabled
-            payload[0] = struct.unpack("<f", received[:4])[0]
-            # print details about the received packet
-            print(f"Received {length} bytes on pipe {pipe_number}: {payload[0]}")
-            start = time.monotonic()  # reset the timeout timer
+            length = radio_recv.payload_size
+
+            buf = radio_recv.read(length)
+            recv_q.put(buf)
+            print(f"Received {length} bytes on pipe {pipe_number}")
 
 if __name__ == '__main__':
     p1 = Process(target=send, args=())

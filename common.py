@@ -1,44 +1,44 @@
-# from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
+from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 
 
-# # GPIO for spidev0.1
-# CSN_PIN_SEND = 0
-# CE_PIN_SEND = 17
+# GPIO for spidev0.1
+CSN_PIN_SEND = 0
+CE_PIN_SEND = 17
 
-# # GPIO for spidev1.0
-# CSN_PIN_RECV = 10
-# CE_PIN_RECV = 27
-
-
-# def setup_radios():
-# # Initialize the RF24 object with the CE and CSN pin numbers
-#     radio_send = RF24(CE_PIN_SEND, CSN_PIN_SEND)
-#     radio_recv = RF24(CE_PIN_RECV, CSN_PIN_RECV)
-
-#     # Begin operation of the radio module
-#     if not radio_send.begin():
-#         raise RuntimeError("NRF24L01+ hardware is not responding")
-
-#     if not radio_recv.begin():
-#         raise RuntimeError("NRF24L01+ hardware is not responding")
+# GPIO for spidev1.0
+CSN_PIN_RECV = 10
+CE_PIN_RECV = 27
 
 
-#     # Set the PA Level (Power Amplifier Level)
-#     radio_send.setPALevel(RF24_PA_LOW)  # Options are MIN, LOW, HIGH, MAXä
-#     radio_recv.setPALevel(RF24_PA_LOW)
+def setup_radios():
+# Initialize the RF24 object with the CE and CSN pin numbers
+    radio_send = RF24(CE_PIN_SEND, CSN_PIN_SEND)
+    radio_recv = RF24(CE_PIN_RECV, CSN_PIN_RECV)
 
-#     # Set the data rate
-#     radio_send.setDataRate(RF24_1MBPS)  # Options are 1MBPS, 2MBPS, 250KBPS
-#     radio_recv.setDataRate(RF24_1MBPS)
+    # Begin operation of the radio module
+    if not radio_send.begin():
+        raise RuntimeError("NRF24L01+ hardware is not responding")
 
-#     # Optionally, you can enable dynamic payloads and auto-acknowledgment features
-#     radio_send.enableDynamicPayloads()
-#     radio_send.enableAckPayload()
+    if not radio_recv.begin():
+        raise RuntimeError("NRF24L01+ hardware is not responding")
 
-#     radio_recv.enableDynamicPayloads()
-#     radio_recv.enableAckPayload()
 
-#     return radio_send, radio_recv
+    # Set the PA Level (Power Amplifier Level)
+    radio_send.setPALevel(RF24_PA_LOW)  # Options are MIN, LOW, HIGH, MAXä
+    radio_recv.setPALevel(RF24_PA_LOW)
+
+    # Set the data rate
+    radio_send.setDataRate(RF24_1MBPS)  # Options are 1MBPS, 2MBPS, 250KBPS
+    radio_recv.setDataRate(RF24_1MBPS)
+
+    # Optionally, you can enable dynamic payloads and auto-acknowledgment features
+    radio_send.enableDynamicPayloads()
+    radio_send.enableAckPayload()
+
+    radio_recv.enableDynamicPayloads()
+    radio_recv.enableAckPayload()
+
+    return radio_send, radio_recv
 
 
 TRANSMISSION_START = b'\xCA\xFE'
@@ -74,10 +74,20 @@ def to_radio_packets(buf: bytes):
 
 def from_radio_packets(buf):
 
-    return bytes()
+    if buf[0] != TRANSMISSION_START or buf[-1] != TRANSMISSION_END:
+        raise Exception("Radio packet sanity check failed!")
+
+    parsed_bytes = []
+    for i in range(1, len(buf)):
+        idx = int(buf[i][0])
+        parsed_bytes[idx] = buf[i][1:]
+
+    flattened = bytes([x for xs in parsed_bytes for x in xs])
+
+    return flattened
 
 
-buf = bytes([1,2,3,4,5,6,7,8,9,0])
+buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
 
 packets = to_radio_packets(buf)
 
