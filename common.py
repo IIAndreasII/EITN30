@@ -80,8 +80,8 @@ def from_radio_packets(buf):
         
         # first two bytes indicate packet index
         idx = int.from_bytes(buf[i][0:IDX_BYTES])
-        if idx < 0 or idx > 255:
-            print("[warn] from_radio_packets: idx out of range, expected 0 <= idx <= 255, got %d", idx)
+        if idx < 0 or idx > len(buf) - 1:
+            pr_warn("[warn] from_radio_packets: idx out of range, expected 0 <= idx <= 255, got", idx)
             return bytes()
 
         # third and fourth bytes indicate number of valid bytes in payload

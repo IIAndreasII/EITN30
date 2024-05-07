@@ -1,5 +1,6 @@
 #!/bin/python3
 import sys
+import time
 
 from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 from tuntap import TunTap
@@ -39,6 +40,9 @@ def recv(recv_q):
             p = rx.read(rx.payload_size)
             recv_q.put(bytes(p))
             pr_dbg("received packet on radio")
+        else:
+            pass
+            time.sleep(0.003)
 
 
 def send(send_q):
