@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+./mobile_route.sh
+./node client
