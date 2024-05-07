@@ -68,6 +68,7 @@ def handle_frames(recv_q):
         collected_packets.append(radio_packet)
         print(radio_packet)
         if radio_packet == common.TRANSMISSION_END:
+            print(collected_packets)
             packet = common.from_radio_packets(collected_packets)
             tun.write(packet)
             print("wrote packet to tun")

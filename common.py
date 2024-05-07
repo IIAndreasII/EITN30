@@ -43,8 +43,10 @@ def setup_radios():
 TRANSMISSION_START = b'\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE'
 TRANSMISSION_END   = b'\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE'
 
+IDX_BYTES = 2
+PAYLOAD_LEN_BYTES = 2
 
-MAX_PACKET_SIZE = 20
+MAX_PACKET_SIZE = 28
 
 
 def to_radio_packets(buf: bytes):
@@ -61,7 +63,7 @@ def to_radio_packets(buf: bytes):
         chunk = []
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
         
-        chunk.append(i.to_bytes() + buf[bytes_read:bytes_read + num_bytes]) # take window 
+        chunk.append(i.to_bytes(length=IDX_BYTES) + num_bytes.to_bytes(length=PAYLOAD_LEN_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
         bytes_read += num_bytes
         i += 1
         packet_list.append(chunk)
@@ -72,26 +74,32 @@ def to_radio_packets(buf: bytes):
 
 
 def from_radio_packets(buf):
-
-    if buf[0] != [TRANSMISSION_START] or buf[-1] != [TRANSMISSION_END]:        
-        raise Exception("Radio packet sanity check failed!")
+    print(buf)
+    #if buf[0] != [TRANSMISSION_START] or buf[-1] != [TRANSMISSION_END]:        
+     #   raise Exception("Radio packet sanity check failed!")
 
     parsed_bytes = [None] * (len(buf) - 2) # ignore control
     for i in range(1, len(buf) - 1):
-        idx = buf[i][0][0]
-        parsed_bytes[idx] = buf[i][0][1:] # it is what it is
+        #print(buf[i][0])
+        idx = int.from_bytes(buf[i][0][0:2])
+        #print(idx)
+        pak_len = int.from_bytes(buf[i][0][2:4])
+        #print(pak_len)
+        parsed_bytes[idx] = buf[i][0][4:4+pak_len] # it is what it is
+        #print(parsed_bytes[idx])
 
+    #print(parsed_bytes)
     flattened = bytes([x for xs in parsed_bytes for x in xs])
 
     return flattened
 
 
-# buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
+# buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
 
 # packets = to_radio_packets(buf)
 
-# print(packets)
+# #print(packets)
 
 # flat = from_radio_packets(packets)
-
 # print(flat)
+# print(len(flat))
