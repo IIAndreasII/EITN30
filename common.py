@@ -53,7 +53,7 @@ MAX_PACKET_SIZE = 28
 def to_radio_packets(buf: bytes):
 
     packet_list = []
-    packet_list.append([TRANSMISSION_START])
+    #packet_list.append([TRANSMISSION_START])
     bytes_read = 0
     i = 0
 
@@ -75,13 +75,13 @@ def to_radio_packets(buf: bytes):
 def from_radio_packets(buf):
 
     # create buffer for defragmented packet, ignore control
-    parsed_bytes = [None] * (len(buf) - 2)
-    for i in range(1, len(buf) - 1):
+    parsed_bytes = [None] * (len(buf) - 1)
+    for i in range(0, len(buf) - 1):
         
         # first two bytes indicate packet index
         idx = int.from_bytes(buf[i][0:IDX_BYTES])
         if idx < 0 or idx > len(buf) - 1:
-            pr_warn("[warn] from_radio_packets: idx out of range, expected 0 <= idx <= 255, got", idx)
+            pr_warn(f"from_radio_packets: idx out of range, expected 0 <= idx <= 255, got {idx}")
             return bytes()
 
         # third and fourth bytes indicate number of valid bytes in payload
