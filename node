@@ -41,7 +41,7 @@ def recv(recv_q):
             length = rx.payload_size
             print(f"received packet with length: {length}")
             p = rx.read(length)
-            recv_q.put(p)
+            recv_q.put(bytes(p))
             print(recv_q.qsize())
 
 

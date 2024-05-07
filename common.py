@@ -74,18 +74,18 @@ def to_radio_packets(buf: bytes):
 
 
 def from_radio_packets(buf):
-    print(buf)
+    #print(buf)
     #if buf[0] != [TRANSMISSION_START] or buf[-1] != [TRANSMISSION_END]:        
      #   raise Exception("Radio packet sanity check failed!")
 
     parsed_bytes = [None] * (len(buf) - 2) # ignore control
     for i in range(1, len(buf) - 1):
-        #print(buf[i][0])
-        idx = int.from_bytes(buf[i][0][0:2])
+        print(buf[i])
+        idx = int.from_bytes(buf[i][0:2])
         #print(idx)
-        pak_len = int.from_bytes(buf[i][0][2:4])
+        pak_len = int.from_bytes(buf[i][2:4])
         #print(pak_len)
-        parsed_bytes[idx] = buf[i][0][4:4+pak_len] # it is what it is
+        parsed_bytes[idx] = buf[i][4:4+pak_len] # it is what it is
         #print(parsed_bytes[idx])
 
     #print(parsed_bytes)
