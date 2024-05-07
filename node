@@ -39,7 +39,7 @@ def recv(recv_q):
         has_p, _ = rx.available_pipe()
         if has_p:
             length = rx.payload_size
-            print(f"recieved packet with length: {length}")
+            print(f"received packet with length: {length}")
             p = rx.read(length)
             recv_q.put(p)
             print(recv_q.qsize())
@@ -48,6 +48,7 @@ def recv(recv_q):
 def send(send_q):
     while running:
         rp = send_q.get()
+        #print("sending packet")
         for p in rp:
             tx.write(p[0])
 
@@ -55,7 +56,7 @@ def send(send_q):
 def tun_listen(send_q):
     while running:
         buf = tun.read()
-        print(buf)
+        #print(buf)
         rp = common.to_radio_packets(buf)
         send_q.put(rp)
         
@@ -65,6 +66,7 @@ def handle_frames(recv_q):
     while running:
         radio_packet = recv_q.get()
         collected_packets.append(radio_packet)
+        print(radio_packet)
         if radio_packet == common.TRANSMISSION_END:
             packet = common.from_radio_packets(collected_packets)
             tun.write(packet)
@@ -87,17 +89,17 @@ def handle_frames(recv_q):
 #         sys.exit(1)
 
 
-try:
-    if sys.argv[1] == 'base':
-        print("Starting node as base station...")
-        is_base = True
-    elif sys.argv[1] == 'client':
-        print("Starting node as client...")
-        is_base = False
-    else:
-        print("error: wrong arguments. Use 'base' or 'client")
-        sys.exit(1)
+if sys.argv[1] == 'base':
+    print("Starting node as base station...")
+    is_base = True
+elif sys.argv[1] == 'client':
+    print("Starting node as client...")
+    is_base = False
+else:
+    print("error: wrong arguments. Use 'base' or 'client")
+    sys.exit(1)
 
+try:
     tun = TunTap(nic_type='Tun', nic_name='MyG')
     if is_base:
         print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
