@@ -1,14 +1,12 @@
 #!/bin/python3
 import sys
-sys.path.append('../')
 
 from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 from tuntap import TunTap
 
-from queue import SimpleQueue
-#from multiprocessing import Process, current_process
 import multiprocessing as mp
-import common
+
+from common import *
 
 running = True
 
@@ -38,27 +36,25 @@ def recv(recv_q):
     while running:
         has_p, _ = rx.available_pipe()
         if has_p:
-            length = rx.payload_size
-            print(f"received packet with length: {length}")
-            p = rx.read(length)
+            p = rx.read(rx.payload_size)
             recv_q.put(bytes(p))
-            print(recv_q.qsize())
+            pr_dbg("received packet on radio")
 
 
 def send(send_q):
     while running:
         rp = send_q.get()
-        #print("sending packet")
         for p in rp:
             tx.write(p[0])
+            pr_dbg("send packet on radio")
 
 
 def tun_listen(send_q):
     while running:
         buf = tun.read()
-        #print(buf)
-        rp = common.to_radio_packets(buf)
+        rp = to_radio_packets(buf)
         send_q.put(rp)
+        pr_dbg("read packet from tun device")
         
 
 def handle_frames(recv_q):
@@ -66,51 +62,37 @@ def handle_frames(recv_q):
     while running:
         radio_packet = recv_q.get()
         collected_packets.append(radio_packet)
-        print(radio_packet)
-        if radio_packet == common.TRANSMISSION_END:
-            print(collected_packets)
-            packet = common.from_radio_packets(collected_packets)
+        if radio_packet == TRANSMISSION_END:
+            packet = from_radio_packets(collected_packets)
+            if packet == bytes():
+                pr_warn("tried to write empty packet to tun")
+                continue
             tun.write(packet)
-            print("wrote packet to tun")
             collected_packets = []
-
-
-# def setup_tun(is_base):
-#     try:
-#         tun = TunTap(nic_type='Tun', nic_name='MyG')
-#         if is_base:
-#             print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
-#             tun.config(ip=BASE_IP, mask=MASK)
-#         else:
-#             print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
-#             tun.config(ip=CLIENT_IP, mask=MASK)
-
-#     except Exception as e:
-#         print(f"Failed to setup tun device!\n{e}")
-#         sys.exit(1)
+            pr_dbg("write packet to tun")
 
 
 if sys.argv[1] == 'base':
-    print("Starting node as base station...")
+    pr_info("Starting node as base station...")
     is_base = True
 elif sys.argv[1] == 'client':
-    print("Starting node as client...")
+    pr_info("Starting node as client...")
     is_base = False
 else:
-    print("error: wrong arguments. Use 'base' or 'client")
+    pr_err("wrong arguments. Use 'base' or 'client")
     sys.exit(1)
 
 try:
     tun = TunTap(nic_type='Tun', nic_name='MyG')
     if is_base:
-        print(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
+        pr_info(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
         tun.config(ip=BASE_IP, mask=MASK)
     else:
-        print(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
+        pr_info(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
         tun.config(ip=CLIENT_IP, mask=MASK)
 
 
-    tx, rx = common.setup_radios()
+    tx, rx = setup_radios()
 
     if is_base:
         rx_channel = 76
@@ -126,12 +108,11 @@ try:
     rx.setChannel(rx_channel)
     tx.setChannel(tx_channel)
 
-    print(f"rx channel: {rx_channel}")
-    print(f"rx address: {rx_address}")
+    pr_dbg(f"rx channel: {rx_channel}")
+    pr_dbg(f"rx address: {rx_address}")
 
-    print(f"tx channel: {tx_channel}")
-    print(f"tx address: {tx_address}")
-    
+    pr_dbg(f"tx channel: {tx_channel}")
+    pr_dbg(f"tx address: {tx_address}")
     
     rx.open_rx_pipe(0, rx_address[0])
     rx.listen = True
@@ -158,6 +139,7 @@ try:
     rx_thread.join()
     tun_thread.join()
     frame_thread.join()
+
 except KeyboardInterrupt:
     running = False
     tun.close()

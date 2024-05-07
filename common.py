@@ -45,6 +45,7 @@ TRANSMISSION_END   = b'\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\
 
 IDX_BYTES = 2
 PAYLOAD_LEN_BYTES = 2
+HEADER_LEN = IDX_BYTES + PAYLOAD_LEN_BYTES
 
 MAX_PACKET_SIZE = 28
 
@@ -52,9 +53,7 @@ MAX_PACKET_SIZE = 28
 def to_radio_packets(buf: bytes):
 
     packet_list = []
-
     packet_list.append([TRANSMISSION_START])
-
     bytes_read = 0
     i = 0
 
@@ -64,9 +63,9 @@ def to_radio_packets(buf: bytes):
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
         
         chunk.append(i.to_bytes(length=IDX_BYTES) + num_bytes.to_bytes(length=PAYLOAD_LEN_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
+        packet_list.append(chunk)
         bytes_read += num_bytes
         i += 1
-        packet_list.append(chunk)
 
     packet_list.append([TRANSMISSION_END])
 
@@ -74,32 +73,37 @@ def to_radio_packets(buf: bytes):
 
 
 def from_radio_packets(buf):
-    #print(buf)
-    #if buf[0] != [TRANSMISSION_START] or buf[-1] != [TRANSMISSION_END]:        
-     #   raise Exception("Radio packet sanity check failed!")
 
-    parsed_bytes = [None] * (len(buf) - 2) # ignore control
+    # create buffer for defragmented packet, ignore control
+    parsed_bytes = [None] * (len(buf) - 2)
     for i in range(1, len(buf) - 1):
-        print(buf[i])
-        idx = int.from_bytes(buf[i][0:2])
-        #print(idx)
-        pak_len = int.from_bytes(buf[i][2:4])
-        #print(pak_len)
-        parsed_bytes[idx] = buf[i][4:4+pak_len] # it is what it is
-        #print(parsed_bytes[idx])
+        
+        # first two bytes indicate packet index
+        idx = int.from_bytes(buf[i][0:IDX_BYTES])
+        if idx < 0 or idx > 255:
+            print("[warn] from_radio_packets: idx out of range, expected 0 <= idx <= 255, got %d", idx)
+            return bytes()
 
-    #print(parsed_bytes)
+        # third and fourth bytes indicate number of valid bytes in payload
+        p_len = int.from_bytes(buf[i][IDX_BYTES:HEADER_LEN])
+        parsed_bytes[idx] = buf[i][HEADER_LEN : (HEADER_LEN + p_len)]
+        
     flattened = bytes([x for xs in parsed_bytes for x in xs])
 
     return flattened
 
 
-# buf = bytes([1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1])
+def pr_info(s):
+    print("[info]", s)
 
-# packets = to_radio_packets(buf)
+debug = True
 
-# #print(packets)
+def pr_dbg(s):
+    if debug:
+        print("[dbg]", s)
 
-# flat = from_radio_packets(packets)
-# print(flat)
-# print(len(flat))
+def pr_warn(s):
+    print("[warn]", s)
+
+def pr_err(s):
+    print("[err]", s)
