@@ -43,7 +43,7 @@ def setup_radios():
 TRANSMISSION_START = b'\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE'
 TRANSMISSION_END   = b'\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE'
 
-IDX_BYTES = 2
+IDX_BYTES = 1
 PAYLOAD_LEN_BYTES = 2
 HEADER_LEN = IDX_BYTES + PAYLOAD_LEN_BYTES
 
@@ -55,19 +55,18 @@ def to_radio_packets(buf: bytes):
     packet_list = []
     #packet_list.append([TRANSMISSION_START])
     bytes_read = 0
-    i = 0
+    ctrl = 0
 
     # Fragment buf into chunks
     while bytes_read < len(buf):
         chunk = []
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
         
-        chunk.append(i.to_bytes(length=IDX_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
+        chunk.append(ctrl.to_bytes(length=IDX_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
         packet_list.append(chunk)
         bytes_read += num_bytes
-        i += 1
 
-    packet_list.append([TRANSMISSION_END])
+    packet_list.append([b'\x01\xBA\xBE'])
 
     return packet_list
 
@@ -77,16 +76,19 @@ def from_radio_packets(buf):
     # create buffer for defragmented packet, ignore control
     #parsed_bytes = [None] * (len(buf) - 1)
     parsed_bytes = bytes()
-    for i in range(0, len(buf) - 1):
+    for i in range(0, len(buf)):
         
         # first two bytes indicate packet index
-        idx = int.from_bytes(buf[i][0:IDX_BYTES])
-        if idx < 0 or idx > len(buf) - 1:
-            pr_warn(f"from_radio_packets: idx out of range, expected 0 <= idx <= 255, got {idx}")
-            return bytes()
+        #idx = int.from_bytes(buf[i][0:IDX_BYTES])
+        ctrl = int.from_bytes(buf[i][0])
+        #if idx < 0 or idx > len(buf) - 1:
+         #   pr_warn(f"from_radio_packets: idx out of range, expected 0 <= idx <= 255, got {idx}")
+          #  return bytes()
 
         # third and fourth bytes indicate number of valid bytes in payload
         #parsed_bytes[idx] = buf[i][IDX_BYTES:]
+        if ctrl == 1:
+            break
         parsed_bytes += buf[i][IDX_BYTES:]
         
     #flattened = bytes([x for xs in parsed_bytes for x in xs])
