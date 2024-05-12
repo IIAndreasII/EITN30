@@ -69,7 +69,7 @@ def handle_frames(recv_q):
         if radio_packet == b'\x01\xBA\xBE':
             pr_dbg(f"received packet with fragments: {len(collected_packets)}")
             packet = from_radio_packets(collected_packets)
-            if packet == bytes():
+            if packet == b'':
                 pr_warn("tried to write empty packet to tun")
                 collected_packets = []
                 continue
