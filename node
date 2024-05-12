@@ -37,7 +37,7 @@ def recv(recv_q):
     while running:
         has_p, _ = rx.available_pipe()
         if has_p:
-            p = rx.read(rx.payload_size)
+            p = rx.read(rx.getDynamicPayloadSize())
             recv_q.put(bytes(p))
             pr_dbg("received packet on radio")
         else:
@@ -89,10 +89,14 @@ else:
 try:
     tun = TunTap(nic_type='Tun', nic_name='MyG')
     if is_base:
-        pr_info(f"Setup tun device:\nip: {BASE_IP}\nmask: {MASK}")
+        pr_info(f"Setup tun device:")
+        pr_info(f"ip: {BASE_IP}")
+        pr_info(f"mask: {MASK}")
         tun.config(ip=BASE_IP, mask=MASK)
     else:
-        pr_info(f"Setup tun device:\nip: {CLIENT_IP}\nmask: {MASK}")
+        pr_info(f"Setup tun device:")
+        pr_info(f"ip: {CLIENT_IP}")
+        pr_info(f"mask: {MASK}")
         tun.config(ip=CLIENT_IP, mask=MASK)
 
 

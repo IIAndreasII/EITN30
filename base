@@ -1,4 +1,3 @@
 #!/usr/bin/bash
 
 ./node base
-./forward.sh

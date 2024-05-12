@@ -85,8 +85,7 @@ def from_radio_packets(buf):
             return bytes()
 
         # third and fourth bytes indicate number of valid bytes in payload
-        p_len = int.from_bytes(buf[i][IDX_BYTES:HEADER_LEN])
-        parsed_bytes[idx] = buf[i][HEADER_LEN : (HEADER_LEN + p_len)]
+        parsed_bytes[idx] = buf[i][IDX_BYTES:]
         
     flattened = bytes([x for xs in parsed_bytes for x in xs])
 
