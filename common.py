@@ -89,7 +89,7 @@ def from_radio_packets(buf):
         #parsed_bytes[idx] = buf[i][IDX_BYTES:]
         if ctrl == 1:
             break
-        parsed_bytes.append(buf[i][IDX_BYTES:])
+        parsed_bytes += bytearray(buf[i][IDX_BYTES:])
         
     #flattened = bytes([x for xs in parsed_bytes for x in xs])
 
