@@ -62,8 +62,8 @@ def tun_listen(send_q):
         
 
 def handle_frames(recv_q):
+    collected_packets = []
     while running:
-        collected_packets = []
         radio_packet = recv_q.get()
         collected_packets.append(radio_packet)
         if radio_packet == b'\x01\xBA\xBE':
@@ -73,7 +73,8 @@ def handle_frames(recv_q):
                 pr_warn("tried to write empty packet to tun")
                 #continue
             tun.write(packet)
-            pr_dbg("write packet to tun")
+            collected_packets = []
+            #pr_dbg("write packet to tun")
 
 
 if sys.argv[1] == 'base':
