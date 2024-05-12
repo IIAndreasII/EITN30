@@ -47,7 +47,7 @@ IDX_BYTES = 2
 PAYLOAD_LEN_BYTES = 2
 HEADER_LEN = IDX_BYTES + PAYLOAD_LEN_BYTES
 
-MAX_PACKET_SIZE = 28
+MAX_PACKET_SIZE = 30
 
 
 def to_radio_packets(buf: bytes):
@@ -62,7 +62,7 @@ def to_radio_packets(buf: bytes):
         chunk = []
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
         
-        chunk.append(i.to_bytes(length=IDX_BYTES) + num_bytes.to_bytes(length=PAYLOAD_LEN_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
+        chunk.append(i.to_bytes(length=IDX_BYTES) + buf[bytes_read:bytes_read + num_bytes]) # take window 
         packet_list.append(chunk)
         bytes_read += num_bytes
         i += 1
