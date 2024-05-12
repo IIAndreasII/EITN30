@@ -100,7 +100,7 @@ def from_radio_packets(buf):
 def pr_info(s):
     print("[info]", s)
 
-debug = True
+debug = False
 
 def pr_dbg(s):
     if debug:
