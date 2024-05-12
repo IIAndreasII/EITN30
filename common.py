@@ -80,7 +80,7 @@ def from_radio_packets(buf):
         
         # first two bytes indicate packet index
         #idx = int.from_bytes(buf[i][0:IDX_BYTES])
-        ctrl = int.from_bytes(buf[i][0])
+        ctrl = buf[i][0]
         #if idx < 0 or idx > len(buf) - 1:
          #   pr_warn(f"from_radio_packets: idx out of range, expected 0 <= idx <= 255, got {idx}")
           #  return bytes()
