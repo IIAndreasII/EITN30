@@ -75,7 +75,8 @@ def to_radio_packets(buf: bytes):
 def from_radio_packets(buf):
 
     # create buffer for defragmented packet, ignore control
-    parsed_bytes = [None] * (len(buf) - 1)
+    #parsed_bytes = [None] * (len(buf) - 1)
+    parsed_bytes = bytes()
     for i in range(0, len(buf) - 1):
         
         # first two bytes indicate packet index
@@ -85,11 +86,13 @@ def from_radio_packets(buf):
             return bytes()
 
         # third and fourth bytes indicate number of valid bytes in payload
-        parsed_bytes[idx] = buf[i][IDX_BYTES:]
+        #parsed_bytes[idx] = buf[i][IDX_BYTES:]
+        parsed_bytes += buf[i][IDX_BYTES:]
         
-    flattened = bytes([x for xs in parsed_bytes for x in xs])
+    #flattened = bytes([x for xs in parsed_bytes for x in xs])
 
-    return flattened
+    #return flattened
+    return parsed_bytes
 
 
 def pr_info(s):
