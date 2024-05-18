@@ -39,7 +39,7 @@ def recv(recv_q):
         if has_p:
             p = rx.read(rx.getDynamicPayloadSize())
             recv_q.put(bytes(p))
-            pr_dbg("received packet on radio")
+            #pr_dbg("received packet on radio")
         else:
             pass
             time.sleep(0.003)
@@ -50,7 +50,7 @@ def send(send_q):
         rp = send_q.get()
         for p in rp:
             tx.write(p[0])
-            pr_dbg("send packet on radio")
+            #pr_dbg("send packet on radio")
 
 
 def tun_listen(send_q):
@@ -58,7 +58,7 @@ def tun_listen(send_q):
         buf = tun.read()
         rp = to_radio_packets(buf)
         send_q.put(rp)
-        pr_dbg("read packet from tun device")
+        #pr_dbg("read packet from tun device")
         
 
 def handle_frames(recv_q):
@@ -67,7 +67,7 @@ def handle_frames(recv_q):
         radio_packet = recv_q.get()
         collected_packets.append(radio_packet)
         if radio_packet[0:IDX_BYTES] == b'\xff\xff':
-            pr_dbg(f"received packet with fragments: {len(collected_packets)}")
+            #pr_dbg(f"received packet with fragments: {len(collected_packets)}")
             packet = from_radio_packets(collected_packets)
             if packet == b'':
                 pr_warn("tried to write empty packet to tun")

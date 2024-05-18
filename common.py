@@ -1,4 +1,4 @@
-from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
+from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS, RF24_2MBPS
 
 from math import ceil
 
@@ -29,8 +29,8 @@ def setup_radios():
     radio_recv.setPALevel(RF24_PA_LOW)
 
     # Set the data rate
-    radio_send.setDataRate(RF24_1MBPS)  # Options are 1MBPS, 2MBPS, 250KBPS
-    radio_recv.setDataRate(RF24_1MBPS)
+    radio_send.setDataRate(RF24_2MBPS)  # Options are 1MBPS, 2MBPS, 250KBPS
+    radio_recv.setDataRate(RF24_2MBPS)
 
     # Optionally, you can enable dynamic payloads and auto-acknowledgment features
     radio_send.enableDynamicPayloads()
