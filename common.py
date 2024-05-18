@@ -84,26 +84,14 @@ def from_radio_packets(buf):
 
     # create buffer for defragmented packet, ignore control
     #parsed_bytes = [None] * (len(buf) - 1)
-    parsed_bytes = bytearray()
+    parsed_bytes = bytes()
     for i in range(0, len(buf)):
-        
-        # first two bytes indicate packet index
-        #idx = int.from_bytes(buf[i][0:IDX_BYTES])
-        ctrl = buf[i][0]
-        #if idx < 0 or idx > len(buf) - 1:
-         #   pr_warn(f"from_radio_packets: idx out of range, expected 0 <= idx <= 255, got {idx}")
-          #  return bytes()
-
-        # third and fourth bytes indicate number of valid bytes in payload
-        #parsed_bytes[idx] = buf[i][IDX_BYTES:]
-        if ctrl == 1:
-            break
-        parsed_bytes += bytearray(buf[i][IDX_BYTES:])
+        parsed_bytes += buf[i][IDX_BYTES:]
         
     #flattened = bytes([x for xs in parsed_bytes for x in xs])
 
     #return flattened
-    return bytes(parsed_bytes)
+    return parsed_bytes
 
 
 def pr_info(s):
