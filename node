@@ -65,8 +65,7 @@ def handle_frames(recv_q):
     collected_packets = []
     while running:
         radio_packet = recv_q.get()
-        collected_packets.append(radio_packet)
-        if radio_packet == b'\x01\xBA\xBE':
+        if radio_packet[0:IDX_BYTES] == b'\x00\x00':
             pr_dbg(f"received packet with fragments: {len(collected_packets)}")
             packet = from_radio_packets(collected_packets)
             if packet == b'':
@@ -76,6 +75,7 @@ def handle_frames(recv_q):
             tun.write(packet)
             collected_packets = []
             #pr_dbg("write packet to tun")
+        collected_packets.append(radio_packet)
 
 
 if sys.argv[1] == 'base':
