@@ -84,14 +84,14 @@ def from_radio_packets(buf):
 
     # create buffer for defragmented packet, ignore control
     #parsed_bytes = [None] * (len(buf) - 1)
-    parsed_bytes = bytes()
+    parsed_bytes = list()
     for i in range(0, len(buf)):
-        parsed_bytes += buf[i][IDX_BYTES:]
+        parsed_bytes.append(buf[i][IDX_BYTES:])
         
     #flattened = bytes([x for xs in parsed_bytes for x in xs])
 
     #return flattened
-    return parsed_bytes
+    return b''.join(parsed_bytes)
 
 
 def pr_info(s):
