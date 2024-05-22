@@ -1,0 +1,12 @@
+INFO:root:Starting server on port 8080
+INFO:root:Request: /100 | Duration: 0.001383 sec | Payload: 100 bytes | By: 127.0.0.1
+INFO:root:Request: /200 | Duration: 0.000695 sec | Payload: 200 bytes | By: 127.0.0.1
+INFO:root:Request: /300 | Duration: 0.000527 sec | Payload: 300 bytes | By: 127.0.0.1
+INFO:root:Request: /400 | Duration: 0.000517 sec | Payload: 400 bytes | By: 127.0.0.1
+INFO:root:Request: /500 | Duration: 0.000723 sec | Payload: 500 bytes | By: 127.0.0.1
+INFO:root:Request: /600 | Duration: 0.000608 sec | Payload: 600 bytes | By: 127.0.0.1
+INFO:root:Request: /700 | Duration: 0.000412 sec | Payload: 700 bytes | By: 127.0.0.1
+INFO:root:Request: /800 | Duration: 0.000423 sec | Payload: 800 bytes | By: 127.0.0.1
+INFO:root:Request: /900 | Duration: 0.000393 sec | Payload: 900 bytes | By: 127.0.0.1
+INFO:root:Request: /1000 | Duration: 0.000414 sec | Payload: 1000 bytes | By: 127.0.0.1
+INFO:root:Starting server on port 8080
