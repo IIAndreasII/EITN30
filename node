@@ -40,9 +40,6 @@ def recv(recv_q):
             p = rx.read(rx.getDynamicPayloadSize())
             recv_q.put(bytes(p))
             #pr_dbg("received packet on radio")
-        else:
-            pass
-            time.sleep(0.003)
 
 
 def send(send_q):
