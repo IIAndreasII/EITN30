@@ -4,4 +4,8 @@
 
 env/
 
-__pycache__/
+**__pycache__/
+**bin/
+python/lib/
+python/include
+pyvenv.*

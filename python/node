@@ -10,7 +10,6 @@ import multiprocessing as mp
 from common import *
 
 running = True
-#https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_cfce33d917454714be9a172a8e6244e3/default/light/1.0
 rx = None
 tx = None
 
