@@ -1,6 +1,5 @@
 #!/bin/python3
 import sys
-import time
 import os
 
 from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
@@ -25,13 +24,12 @@ is_base = False
 NODE1 = [b'1Node']
 NODE2 = [b'2Node']
 
+DEV_NAME = 'MyG'
 BASE_IP   = '11.11.11.2'
 CLIENT_IP = '11.11.11.3'
-
 MASK = '255.255.255.0'
 
 tun = None
-
 
 def recv(recv_q):
     while running:
@@ -63,7 +61,7 @@ def handle_frames(recv_q):
     while running:
         radio_packet = recv_q.get()
         collected_packets.append(radio_packet)
-        if radio_packet[0:IDX_BYTES] == b'\xff\xff':
+        if radio_packet[0:CTRL_BYTES] == b'\xff':
             #pr_dbg(f"received packet with fragments: {len(collected_packets)}")
             packet = from_radio_packets(collected_packets)
             if packet == b'':
@@ -86,18 +84,20 @@ else:
     sys.exit(1)
 
 try:
-    tun = TunTap(nic_type='Tun', nic_name='MyG')
+    tun = TunTap(nic_type='Tun', nic_name=DEV_NAME)
+    pr_info(f"Setup tun device as '{DEV_NAME}':")
     if is_base:
-        pr_info(f"Setup tun device:")
         pr_info(f"ip: {BASE_IP}")
         pr_info(f"mask: {MASK}")
         tun.config(ip=BASE_IP, mask=MASK)
     else:
-        pr_info(f"Setup tun device:")
         pr_info(f"ip: {CLIENT_IP}")
         pr_info(f"mask: {MASK}")
         tun.config(ip=CLIENT_IP, mask=MASK)
-        os.system(f"ip route add default via {CLIENT_IP} dev MyG")
+        cmd = f"ip route add default via {CLIENT_IP} dev {DEV_NAME}"
+        pr_info(f"setup default routing via {DEV_NAME}")
+        os.system(cmd)
+        pr_dbg(cmd)
 
 
     tx, rx = setup_radios()

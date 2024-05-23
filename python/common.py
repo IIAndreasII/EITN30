@@ -40,21 +40,16 @@ def setup_radios():
     radio_recv.enableAckPayload()
     return radio_send, radio_recv
 
-
-TRANSMISSION_START = b'\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE\xCA\xFE'
-TRANSMISSION_END   = b'\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE\xBA\xBE'
-
-IDX_BYTES = 2
+CTRL_BYTES = 1
 PAYLOAD_LEN_BYTES = 2
-HEADER_LEN = IDX_BYTES + PAYLOAD_LEN_BYTES
+HEADER_LEN = CTRL_BYTES + PAYLOAD_LEN_BYTES
 
-MAX_PACKET_SIZE = 30
+MAX_PACKET_SIZE = 31
 
 
 def to_radio_packets(buf: bytes):
 
     packet_list = []
-    #packet_list.append([TRANSMISSION_START])
     bytes_read = 0
     ctrl = 0
 
@@ -66,9 +61,9 @@ def to_radio_packets(buf: bytes):
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
         head = 0
         if ctrl == max_fragments - 1:
-            head = b'\xff\xff'
+            head = b'\xff'
         else:
-            head = ctrl.to_bytes(length=IDX_BYTES)
+            head = b'\x00'
         
         chunk.append(head + buf[bytes_read:bytes_read + num_bytes]) # take window 
         packet_list.append(chunk)
@@ -81,16 +76,9 @@ def to_radio_packets(buf: bytes):
 
 
 def from_radio_packets(buf):
-
-    # create buffer for defragmented packet, ignore control
-    #parsed_bytes = [None] * (len(buf) - 1)
     parsed_bytes = list()
     for i in range(0, len(buf)):
-        parsed_bytes.append(buf[i][IDX_BYTES:])
-        
-    #flattened = bytes([x for xs in parsed_bytes for x in xs])
-
-    #return flattened
+        parsed_bytes.append(buf[i][CTRL_BYTES:])
     return b''.join(parsed_bytes)
 
 
