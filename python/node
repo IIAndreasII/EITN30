@@ -1,6 +1,7 @@
 #!/bin/python3
 import sys
 import time
+import os
 
 from pyrf24 import RF24, RF24_PA_LOW, RF24_1MBPS
 from tuntap import TunTap
@@ -96,6 +97,7 @@ try:
         pr_info(f"ip: {CLIENT_IP}")
         pr_info(f"mask: {MASK}")
         tun.config(ip=CLIENT_IP, mask=MASK)
+        os.system(f"ip route add default via {CLIENT_IP} dev MyG")
 
 
     tx, rx = setup_radios()
