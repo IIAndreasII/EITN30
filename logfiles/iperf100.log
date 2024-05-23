@@ -1,0 +1,117 @@
+Connecting to host 11.11.11.2, port 5201
+[  6] local 11.11.11.3 port 57758 connected to 11.11.11.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  6]   0.00-1.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   1.00-2.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   2.00-3.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   3.00-4.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   4.00-5.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   5.00-6.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   6.00-7.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   7.00-8.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   8.00-9.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   9.00-10.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  10.00-11.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  11.00-12.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  12.00-13.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  13.00-14.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  14.00-15.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  15.00-16.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  16.00-17.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  17.00-18.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  18.00-19.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  19.00-20.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  20.00-21.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  21.00-22.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  22.00-23.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  23.00-24.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  24.00-25.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  25.00-26.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  26.00-27.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  27.00-28.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  28.00-29.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  29.00-30.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  6]   0.00-30.00  sec   366 KBytes   100 Kbits/sec  0.000 ms  0/259 (0%)  sender
+[  6]   0.00-31.96  sec   325 KBytes  83.4 Kbits/sec  84.101 ms  28/258 (11%)  receiver
+
+iperf Done.
+Connecting to host 11.11.11.2, port 5201
+[  6] local 11.11.11.3 port 42026 connected to 11.11.11.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  6]   0.00-1.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   1.00-2.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   2.00-3.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   3.00-4.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   4.00-5.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   5.00-6.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   6.00-7.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   7.00-8.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   8.00-9.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   9.00-10.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  10.00-11.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  11.00-12.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  12.00-13.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  13.00-14.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  14.00-15.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  15.00-16.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  16.00-17.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  17.00-18.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  18.00-19.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  19.00-20.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  20.00-21.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  21.00-22.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  22.00-23.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  23.00-24.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  24.00-25.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  25.00-26.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  26.00-27.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  27.00-28.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  28.00-29.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  29.00-30.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  6]   0.00-30.00  sec   366 KBytes   100 Kbits/sec  0.000 ms  0/259 (0%)  sender
+[  6]   0.00-30.01  sec   335 KBytes  91.5 Kbits/sec  4.494 ms  22/259 (8.5%)  receiver
+
+iperf Done.
+Connecting to host 11.11.11.2, port 5201
+[  6] local 11.11.11.3 port 50496 connected to 11.11.11.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  6]   0.00-1.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   1.00-2.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   2.00-3.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   3.00-4.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   4.00-5.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   5.00-6.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   6.00-7.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   7.00-8.00   sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]   8.00-9.00   sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]   9.00-10.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  10.00-11.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  11.00-12.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  12.00-13.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  13.00-14.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  14.00-15.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  15.00-16.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  16.00-17.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  17.00-18.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  18.00-19.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  19.00-20.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  20.00-21.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  21.00-22.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  22.00-23.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  23.00-24.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  24.00-25.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  25.00-26.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  26.00-27.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  27.00-28.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+[  6]  28.00-29.00  sec  12.7 KBytes   104 Kbits/sec  9  
+[  6]  29.00-30.00  sec  11.3 KBytes  92.7 Kbits/sec  8  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  6]   0.00-30.00  sec   366 KBytes   100 Kbits/sec  0.000 ms  0/259 (0%)  sender
+[  6]   0.00-32.27  sec   349 KBytes  88.7 Kbits/sec  104.397 ms  12/259 (4.6%)  receiver
+
+iperf Done.
