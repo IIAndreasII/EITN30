@@ -9,3 +9,4 @@ env/
 python/lib/
 python/include
 pyvenv.*
+*.o

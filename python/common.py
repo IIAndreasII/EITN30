@@ -10,6 +10,8 @@ CE_PIN_SEND = 17
 CSN_PIN_RECV = 10
 CE_PIN_RECV = 27
 
+CTRL_BYTES = 1
+MAX_PACKET_SIZE = 31
 
 def setup_radios():
 # Initialize the RF24 object with the CE and CSN pin numbers
@@ -40,12 +42,6 @@ def setup_radios():
     radio_recv.enableAckPayload()
     return radio_send, radio_recv
 
-CTRL_BYTES = 1
-PAYLOAD_LEN_BYTES = 2
-HEADER_LEN = CTRL_BYTES + PAYLOAD_LEN_BYTES
-
-MAX_PACKET_SIZE = 31
-
 
 def to_radio_packets(buf: bytes):
 
@@ -59,18 +55,13 @@ def to_radio_packets(buf: bytes):
     while bytes_read < len(buf):
         chunk = []
         num_bytes = min(len(buf) - bytes_read, MAX_PACKET_SIZE)
-        head = 0
-        if ctrl == max_fragments - 1:
-            head = b'\xff'
-        else:
-            head = b'\x00'
+        
+        head = b'\xff' if ctrl == max_fragments - 1 else b'\x00'
         
         chunk.append(head + buf[bytes_read:bytes_read + num_bytes]) # take window 
         packet_list.append(chunk)
         bytes_read += num_bytes
         ctrl += 1
-
-    packet_list[-1]
 
     return packet_list
 
