@@ -7,6 +7,11 @@ from tuntap import TunTap
 
 import multiprocessing as mp
 
+#from multiprocessing import Queue
+from faster_fifo import Queue
+from queue import Full, Empty
+
+
 from common import *
 
 running = True
@@ -41,8 +46,12 @@ def recv(recv_q):
 
 
 def send(send_q):
+    rp = []
     while running:
-        rp = send_q.get()
+        try:
+            rp = send_q.get()
+        except Empty:
+            continue
         for p in rp:
             tx.write(p[0])
             #pr_dbg("send packet on radio")
@@ -58,10 +67,15 @@ def tun_listen(send_q):
 
 def handle_frames(recv_q):
     collected_packets = []
+    rps = []
     while running:
-        radio_packet = recv_q.get()
-        collected_packets.append(radio_packet)
-        if radio_packet[0:CTRL_BYTES] == b'\xff':
+        try:
+            rps = recv_q.get()
+        except Empty:
+            continue
+        #for rp in rps:
+        collected_packets.append(rps)
+        if rps[0:CTRL_BYTES] == b'\xff':
             #pr_dbg(f"received packet with fragments: {len(collected_packets)}")
             packet = from_radio_packets(collected_packets)
             if packet == b'':
@@ -130,8 +144,8 @@ try:
 
     #setup_tun(is_base)
 
-    recv_q = mp.Queue()
-    send_q = mp.Queue()
+    recv_q = Queue()
+    send_q = Queue()
 
     tx_thread = mp.Process(target=send, args=(send_q,))
     rx_thread = mp.Process(target=recv, args=(recv_q,))
